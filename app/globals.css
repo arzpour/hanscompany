@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-vazirmatn), Tahoma, sans-serif;
+  --font-display: var(--font-syne), var(--font-vazirmatn), sans-serif;
+  --color-background: #0a0a0a;
+  --color-foreground: #f5f5f5;
+  --color-muted: #c8c8c8;
+  --color-red: #c1121f;
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --animate-push: push 32s ease-in-out infinite alternate;
+  --animate-rise: rise 420ms var(--ease-enter) both;
+}
+
+@utility reveal-exit {
+  transition:
+    opacity 240ms var(--ease-exit),
+    translate 240ms var(--ease-exit),
+    visibility 0s linear 240ms;
+}
+
+@utility reveal-enter {
+  transition:
+    opacity 800ms var(--ease-enter) 280ms,
+    translate 800ms var(--ease-enter) 280ms,
+    visibility 0s;
+}
+
+@keyframes push {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.07);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+html {
+  color-scheme: dark;
+}
+
+::selection {
+  background: var(--color-red);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
