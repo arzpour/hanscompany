@@ -12,7 +12,7 @@ export default function HomePage() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[72%_42%] motion-safe:animate-push"
+          className="object-cover object-[center_38%] motion-safe:animate-push min-[681px]:object-[72%_42%]"
         />
       </div>
       <div
