@@ -1,0 +1,546 @@
+.nx {
+  --r: #e10600;
+  --w: #f0f0f0;
+  --g: #7a7a7a;
+  --nx-font: var(--font-vazir), Vazirmatn, Tahoma, sans-serif;
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #050505;
+  color: var(--w);
+  font-family: var(--nx-font);
+  line-height: normal;
+}
+
+@media (hover: hover) {
+  .nx,
+  .nx a,
+  .nx button {
+    cursor: none;
+  }
+}
+
+.nx a,
+.nx button {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nx button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.nx a:focus-visible,
+.nx button:focus-visible {
+  outline: 1px solid var(--r);
+  outline-offset: 5px;
+}
+
+.nx-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.nx-bgglow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 60% 55% at 50% 50%, #2a0a0866, transparent 70%);
+}
+
+.nx-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.1;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence baseFrequency='.9' numOctaves='2'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+  animation: nx-gr 0.5s steps(5) infinite;
+}
+
+@keyframes nx-gr {
+  0% {
+    background-position: 0 0;
+  }
+  25% {
+    background-position: -40px 30px;
+  }
+  50% {
+    background-position: 30px -50px;
+  }
+  75% {
+    background-position: -60px -20px;
+  }
+  100% {
+    background-position: 20px 40px;
+  }
+}
+
+.nx-vig {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  background: radial-gradient(ellipse at center, transparent 50%, #000d 100%);
+}
+
+.nx-lb {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 50vh;
+  background: #050505;
+  z-index: 9;
+  transition: height 2.2s cubic-bezier(0.7, 0, 0.2, 1) 0.4s;
+  pointer-events: none;
+}
+
+.nx-lb-t {
+  top: 0;
+}
+
+.nx-lb-b {
+  bottom: 0;
+}
+
+.nx.is-open .nx-lb {
+  height: 0;
+}
+
+.nx-ghost {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+  font: 900 22vw var(--nx-font);
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1px #ffffff17;
+  white-space: nowrap;
+  transition: opacity 0.7s;
+  direction: ltr;
+}
+
+.nx-ui {
+  position: fixed;
+  z-index: 8;
+  opacity: 0;
+  transition: opacity 1.6s;
+}
+
+.nx.is-in .nx-ui {
+  opacity: 1;
+}
+
+.nx-top {
+  top: max(24px, env(safe-area-inset-top, 0px));
+  left: 4vw;
+  right: 4vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+.nx-logo {
+  margin: 0;
+  pointer-events: auto;
+  line-height: 0;
+}
+
+.nx-logo img {
+  display: block;
+  width: clamp(120px, 16vw, 168px);
+  height: auto;
+}
+
+.nx-links {
+  display: flex;
+  gap: 26px;
+  font: 200 12px var(--nx-font);
+  letter-spacing: 2px;
+  pointer-events: auto;
+}
+
+.nx-links a {
+  color: var(--g);
+  transition: 0.3s;
+}
+
+.nx-links a:hover {
+  color: var(--w);
+}
+
+.nx-idx {
+  right: 4vw;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(250px, 40vw);
+  z-index: 8;
+}
+
+.nx-idx a {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 0 10px;
+  border-top: 1px solid #ffffff1f;
+  color: var(--g);
+  transition:
+    color 0.35s,
+    transform 0.35s;
+}
+
+.nx-idx a:last-child {
+  border-bottom: 1px solid #ffffff1f;
+}
+
+.nx-idx small {
+  font: 200 11px var(--nx-font);
+  letter-spacing: 2px;
+  width: 22px;
+  color: var(--g);
+  transition: 0.3s;
+}
+
+.nx-idx b {
+  font: 900 clamp(17px, 2vw, 26px) var(--nx-font);
+}
+
+.nx-idx i {
+  margin-right: auto;
+  font: 200 10px var(--nx-font);
+  font-style: normal;
+  letter-spacing: 3px;
+  direction: ltr;
+  opacity: 0.6;
+}
+
+.nx-idx a.on {
+  color: var(--w);
+  transform: translateX(-10px);
+}
+
+.nx-idx a.on small {
+  color: var(--r);
+}
+
+.nx-card {
+  position: fixed;
+  left: 4vw;
+  bottom: max(34px, calc(env(safe-area-inset-bottom, 0px) + 34px));
+  height: 230px;
+  width: min(520px, 60vw);
+  max-width: min(520px, 60vw);
+  transition: opacity 1.6s;
+}
+
+.nx-pane {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px);
+  transition:
+    opacity 0.6s,
+    transform 0.6s,
+    visibility 0s 0.6s;
+  pointer-events: none;
+}
+
+.nx-pane.on {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  pointer-events: auto;
+  transition:
+    opacity 0.6s,
+    transform 0.6s,
+    visibility 0s;
+}
+
+.nx-pane small {
+  display: block;
+  font: 200 12px var(--nx-font);
+  letter-spacing: 4px;
+  color: var(--r);
+  direction: ltr;
+  text-align: right;
+  margin-bottom: 8px;
+}
+
+.nx-pane h2 {
+  margin: 0;
+  font: 900 clamp(40px, 6.4vw, 92px) var(--nx-font);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.nx-pane h2.s {
+  font: 200 clamp(26px, 3.6vw, 52px) var(--nx-font);
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+.nx-pane h2.s em {
+  font-style: normal;
+  color: var(--r);
+  font-weight: 500;
+}
+
+.nx-pane p {
+  margin: 12px 0 0;
+  font: 200 clamp(13px, 1.4vw, 17px) var(--nx-font);
+  line-height: 1.9;
+  color: #cfcfcf;
+  max-width: 420px;
+}
+
+.nx-go {
+  display: inline-block;
+  margin-top: 16px;
+  font: 500 14px var(--nx-font);
+  color: var(--w);
+  border-bottom: 1px solid var(--r);
+  padding-bottom: 4px;
+  transition: 0.3s;
+}
+
+.nx-go:hover {
+  color: var(--r);
+}
+
+.nx-hud {
+  left: 4vw;
+  top: max(64px, calc(env(safe-area-inset-top, 0px) + 64px));
+  font: 200 11px var(--nx-font);
+  letter-spacing: 2px;
+  color: var(--g);
+  direction: ltr;
+  line-height: 1.9;
+  pointer-events: none;
+}
+
+.nx-hud i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--r);
+  margin-right: 8px;
+  animation: nx-bl 1s steps(2) infinite;
+}
+
+@keyframes nx-bl {
+  50% {
+    opacity: 0;
+  }
+}
+
+.nx-hud b {
+  color: var(--w);
+  font-weight: 500;
+}
+
+.nx-prog {
+  right: 4vw;
+  bottom: max(34px, calc(env(safe-area-inset-bottom, 0px) + 34px));
+  width: min(250px, 40vw);
+  pointer-events: none;
+}
+
+.nx-prog div {
+  height: 1px;
+  background: #ffffff26;
+  position: relative;
+}
+
+.nx-prog div i {
+  position: absolute;
+  left: 0;
+  top: -0.5px;
+  height: 2px;
+  background: var(--r);
+  width: 0;
+}
+
+.nx-prog span {
+  display: block;
+  margin-top: 8px;
+  font: 200 10px var(--nx-font);
+  letter-spacing: 3px;
+  color: var(--g);
+  direction: ltr;
+  text-align: left;
+}
+
+.nx-prog a {
+  pointer-events: auto;
+  color: var(--g);
+}
+
+.nx-prog a:hover {
+  color: var(--w);
+}
+
+.nx-prog b {
+  color: #f0f0f0;
+  font-weight: 500;
+}
+
+.nx-tag {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 6;
+  pointer-events: none;
+  font: 200 10px var(--nx-font);
+  letter-spacing: 3px;
+  color: #bbb;
+  direction: ltr;
+  opacity: 0;
+  transition: opacity 0.8s;
+  white-space: nowrap;
+}
+
+.nx.is-tags .nx-tag {
+  opacity: 0.85;
+}
+
+.nx.is-tags .nx-tag.h {
+  opacity: 0;
+}
+
+.nx-toast {
+  position: fixed;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%) scale(0.92);
+  z-index: 10;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.5s;
+}
+
+.nx-toast.on {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+.nx-toast b {
+  display: block;
+  font: 900 clamp(40px, 8vw, 110px) var(--nx-font);
+  color: var(--r);
+}
+
+.nx-toast span {
+  font: 200 14px var(--nx-font);
+  color: #ddd;
+}
+
+.nx-cur {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: var(--r);
+  z-index: 11;
+  pointer-events: none;
+}
+
+.nx-ring {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border: 1px solid #fff6;
+  border-radius: 50%;
+  z-index: 11;
+  pointer-events: none;
+  transition:
+    width 0.3s,
+    height 0.3s,
+    margin 0.3s,
+    border-color 0.3s;
+}
+
+.nx-ring.big {
+  width: 84px;
+  height: 84px;
+  margin: -42px 0 0 -42px;
+  border-color: var(--r);
+}
+
+@media (hover: none) {
+  .nx-cur,
+  .nx-ring {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .nx-idx {
+    top: auto;
+    bottom: max(150px, calc(env(safe-area-inset-bottom, 0px) + 150px));
+    transform: none;
+    width: 44vw;
+  }
+
+  .nx-idx i {
+    display: none;
+  }
+
+  .nx-card {
+    width: 50vw;
+  }
+
+  .nx-pane h2 {
+    font-size: 34px;
+  }
+
+  .nx-pane p {
+    display: none;
+  }
+
+  .nx-prog {
+    display: none;
+  }
+
+  .nx-hud {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nx-grain {
+    animation: none;
+  }
+
+  .nx-lb {
+    display: none;
+  }
+
+  .nx-ui,
+  .nx-ghost,
+  .nx-pane,
+  .nx-tag {
+    transition-duration: 0.01ms;
+  }
+}
