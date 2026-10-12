@@ -745,12 +745,12 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
     });
     // dendrite hairs
     centers.forEach((p, i) => {
-      const n = i ? 34 : 70;
+      const n = i ? 56 : 110;
       const Rs = RS[i];
       for (let k = 0; k < n; k++) {
         const dr = randomUnit();
         const s = p.clone().addScaledVector(dr, Rs * 0.98);
-        const len = Rs * rnd(0.7, 2.1);
+        const len = Rs * rnd(0.7, 2.6);
         add(s, s.clone().addScaledVector(dr, len), {
           c: i,
           w: 0.3,
@@ -774,18 +774,34 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
     });
     // backdrop network
     const bd: THREE.Vector3[] = [];
-    for (let i = 0; i < 90; i++) {
-      const p = new THREE.Vector3(rnd(-W * 0.62, W * 0.62), rnd(-430, 430), rnd(-420, 260));
-      if (p.distanceTo(core) < 130) continue;
+    const backdropCount = desk ? 260 : 150;
+    for (let i = 0; i < backdropCount; i++) {
+      const p = new THREE.Vector3(rnd(-W * 0.72, W * 0.72), rnd(-470, 470), rnd(-460, 280));
+      if (p.distanceTo(core) < 120) continue;
       bd.push(p);
-      nodes.push({ p, s: rnd(2, 7), c: 0, d: rnd(0.25, 0.75) });
+      nodes.push({ p, s: rnd(1.6, 6), c: 0, d: rnd(0.25, 0.75) });
     }
     bd.forEach((a) => {
       bd.map((b) => ({ b, d: a.distanceTo(b) }))
-        .filter((o) => o.d > 1 && o.d < 230)
+        .filter((o) => o.d > 1 && o.d < 260)
         .sort((x, y) => x.d - y.d)
-        .slice(0, 2)
+        .slice(0, 3)
         .forEach((o) => add(a, o.b, { c: 0, w: 0.12, seg: 6, cv: 0.25, d0: 0.3, d1: 0.8 }));
+      // free dendrites
+      const sprouts = Math.random() < 0.55 ? 2 : 1;
+      for (let k = 0; k < sprouts; k++) {
+        const end = a.clone().addScaledVector(randomUnit(), rnd(28, 70));
+        add(a, end, { c: 0, w: 0.08, seg: 4, cv: 0.45, d0: 0.35, d1: 0.85 });
+      }
+    });
+    // tie the backdrop into the orbs
+    centers.forEach((c, i) => {
+      bd.map((b) => ({ b, d: b.distanceTo(c) }))
+        .sort((x, y) => x.d - y.d)
+        .slice(0, i ? 4 : 6)
+        .forEach((o) =>
+          add(c, o.b, { c: i, w: 0.18, seg: 10, cv: 0.3, d0: arrive(i) + 0.1, d1: arrive(i) + 0.3 }),
+        );
     });
 
     const NS = edges.length;
