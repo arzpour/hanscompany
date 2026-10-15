@@ -709,7 +709,7 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
       new THREE.Vector3(C[0], C[1], C[2]),
       ...BP.slice(0, nB).map((p) => new THREE.Vector3(p[0], p[1], p[2])),
     ];
-    const RS = [desk ? 70 : 48, ...Array.from({ length: nB }, () => (desk ? 56 : 36))];
+    const RS = [desk ? 98 : 66, ...Array.from({ length: nB }, () => (desk ? 56 : 36))];
     const core = centers[0];
     const edges: Edge[] = [];
     const nodes: Array<{ p: THREE.Vector3; s: number; c: number; d: number }> = [];
@@ -790,7 +790,7 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
     const backdropCount = desk ? 260 : 150;
     for (let i = 0; i < backdropCount; i++) {
       const p = new THREE.Vector3(rnd(-W * 0.72, W * 0.72), rnd(-470, 470), rnd(-460, 280));
-      if (p.distanceTo(core) < 120) continue;
+      if (p.distanceTo(core) < 155) continue;
       bd.push(p);
       nodes.push({ p, s: rnd(1.6, 6), c: 0, d: rnd(0.25, 0.75) });
     }
@@ -885,7 +885,7 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
     g3.setAttribute("position", F(centers.flatMap((p) => [p.x, p.y, p.z]), 3));
     g3.setAttribute(
       "aS",
-      F([desk ? 470 : 330, ...Array.from({ length: nB }, () => (desk ? 330 : 230))], 1),
+      F([desk ? 560 : 400, ...Array.from({ length: nB }, () => (desk ? 330 : 230))], 1),
     );
     g3.setAttribute("aC", F(Array.from({ length: nAll }, (_, i) => i), 1));
     g3.setAttribute("aD", F(Array.from({ length: nAll }, (_, i) => (i ? 0.43 + i * 0.07 : 0)), 1));
@@ -1160,7 +1160,7 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
     }
 
     // highlights — soft ease in/out with focus
-    const hlEase = focus >= 0 ? 0.045 : 0.038;
+    const hlEase = focus >= 0 ? 0.034 : 0.028;
     for (let i = 0; i < nAll; i++) {
       const target = i === 0 ? (focus < 0 ? 1 : 0) : i - 1 === focus ? 1 : 0;
       H[i] += (target - H[i]) * hlEase;
@@ -1176,7 +1176,7 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
     // motion
     const rY = focus >= 0 || reduced ? 0 : Math.sin(t * 0.16) * 0.3 + m.nx * 0.22;
     const rX = focus >= 0 || reduced ? 0 : m.ny * 0.12;
-    const rotEase = focus >= 0 ? 0.028 : 0.032;
+    const rotEase = focus >= 0 ? 0.022 : 0.026;
     group.rotation.y += (rY - group.rotation.y) * rotEase;
     group.rotation.x += (rX - group.rotation.x) * rotEase;
     centers.forEach((c, i) => {
@@ -1184,11 +1184,11 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
         // Freeze bob while focused so screen-space pick stays stable.
         const amp = focus >= 0 ? 0 : 5;
         const y = c.y + Math.sin(t * 0.8 + i) * amp;
-        spheres[i].position.y += (y - spheres[i].position.y) * (focus >= 0 ? 0.055 : 0.07);
+        spheres[i].position.y += (y - spheres[i].position.y) * (focus >= 0 ? 0.042 : 0.055);
       }
     });
 
-    // camera — full close approach; slower ease in on hover, softer ease out on leave
+    // camera — cinematic ease in on hover, softer ease out on leave
     const wide = window.innerWidth / window.innerHeight > 1.1;
     const dz = 1 + Math.max(0, 1 - tt / 4.4) * 1.3;
     const baseZ = camZ * dz * (wide ? 1.04 : 1.5);
@@ -1201,9 +1201,9 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
       camL.copy(v3).multiplyScalar(0.92);
     }
     const camEase =
-      enterIndex !== null ? 0.048 : focus >= 0 ? 0.022 : 0.026;
+      enterIndex !== null ? 0.042 : focus >= 0 ? 0.016 : 0.02;
     const lookEase =
-      enterIndex !== null ? 0.065 : focus >= 0 ? 0.028 : 0.032;
+      enterIndex !== null ? 0.055 : focus >= 0 ? 0.02 : 0.024;
     camera.position.lerp(camT, camEase);
     camLc.lerp(camL, lookEase);
     camera.lookAt(camLc);
