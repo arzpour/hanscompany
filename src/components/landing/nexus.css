@@ -146,7 +146,7 @@
   left: 4vw;
   right: 4vw;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: flex-start;
   pointer-events: none;
 }
@@ -251,11 +251,11 @@
   width: 100%;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(14px);
+  transform: translateY(18px);
   transition:
-    opacity 0.6s,
-    transform 0.6s,
-    visibility 0s 0.6s;
+    opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.95s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s 0.95s;
   pointer-events: none;
 }
 
@@ -265,8 +265,8 @@
   transform: none;
   pointer-events: auto;
   transition:
-    opacity 0.6s,
-    transform 0.6s,
+    opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
     visibility 0s;
 }
 
@@ -319,6 +319,20 @@
 
 .nx-go:hover {
   color: var(--r);
+}
+
+.nx-copy {
+  left: 50%;
+  bottom: max(16px, calc(env(safe-area-inset-bottom, 0px) + 12px));
+  transform: translateX(-50%);
+  margin: 0;
+  font: 200 11px var(--nx-font);
+  letter-spacing: 0.5px;
+  color: var(--g);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0.7;
+  z-index: 6;
 }
 
 .nx-hud {

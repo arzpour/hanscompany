@@ -619,11 +619,24 @@ void main(){int ci=int(aC+.5);float h=uH[ci];float gr=clamp((uGrow-aD)/.2,0.,1.)
   let lock = -1;
   let enterIndex: number | null = null;
   let lastFire = 0;
+  let lastFocusChange = -99;
   let rrobin = 0;
   let lastTex = 0;
   let raf = 0;
   let disposed = false;
   const m = { px: window.innerWidth / 2, py: window.innerHeight / 2, nx: 0, ny: 0, t: -99 };
+  /**
+   * Hover focus is anchored to the pointer, not the projected orb.
+   * Strong camera zoom moves the orb on screen; locking to mouse travel
+   * keeps focus stable while still allowing a close approach.
+   */
+  const ACQUIRE_R = 120;
+  const POINTER_HOLD = 72;
+  const POINTER_LEAVE = 130;
+  const FOCUS_SWITCH_GAP = 0.32;
+  const hoverAnchor = { i: -1, x: 0, y: 0 };
+  const raycaster = new THREE.Raycaster();
+  const pointerNDC = new THREE.Vector2();
 
   function updTex(t: number) {
     if (t - lastTex < 0.06) return;
@@ -954,17 +967,78 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
 
   const sp = Array.from({ length: nAll }, () => ({ x: 0, y: 0 }));
 
-  const nearestBrand = () => {
-    let best = 95;
+  const brandDist = (i: number) => Math.hypot(sp[i + 1].x - m.px, sp[i + 1].y - m.py);
+
+  const setHoverAnchor = (i: number) => {
+    hoverAnchor.i = i;
+    hoverAnchor.x = m.px;
+    hoverAnchor.y = m.py;
+  };
+
+  const clearHoverAnchor = () => {
+    hoverAnchor.i = -1;
+  };
+
+  const raycastBrand = () => {
+    if (spheres.length <= 1) return -1;
+    pointerNDC.set((m.px / window.innerWidth) * 2 - 1, -(m.py / window.innerHeight) * 2 + 1);
+    raycaster.setFromCamera(pointerNDC, camera);
+    const brandMeshes = spheres.slice(1);
+    const hits = raycaster.intersectObjects(brandMeshes, false);
+    if (!hits.length) return -1;
+    const idx = brandMeshes.indexOf(hits[0].object as THREE.Mesh);
+    return idx >= 0 ? idx : -1;
+  };
+
+  /** Screen acquire + pointer-anchored sticky hold (safe under strong camera zoom). */
+  const nearestBrand = (current: number) => {
+    const rayHit = raycastBrand();
+
+    let best = Infinity;
     let found = -1;
     for (let i = 0; i < nB; i++) {
-      const d = Math.hypot(sp[i + 1].x - m.px, sp[i + 1].y - m.py);
+      const d = brandDist(i);
       if (d < best) {
         best = d;
         found = i;
       }
     }
-    return found;
+    const screenHit = best < ACQUIRE_R ? found : -1;
+    const acquired = rayHit >= 0 ? rayHit : screenHit;
+
+    if (hoverAnchor.i >= 0) {
+      const travel = Math.hypot(m.px - hoverAnchor.x, m.py - hoverAnchor.y);
+      // Pointer barely moved — keep zoomed brand even if projection drifted.
+      if (travel < POINTER_HOLD) return hoverAnchor.i;
+      // Still over the same mesh via raycast — refresh anchor, keep focus.
+      if (rayHit === hoverAnchor.i) {
+        setHoverAnchor(hoverAnchor.i);
+        return hoverAnchor.i;
+      }
+      // Moved onto another brand deliberately.
+      if (acquired >= 0 && acquired !== hoverAnchor.i && travel > POINTER_HOLD) {
+        setHoverAnchor(acquired);
+        return acquired;
+      }
+      // Left the hold zone and nothing else acquired.
+      if (travel > POINTER_LEAVE && acquired < 0 && rayHit < 0) {
+        clearHoverAnchor();
+        return -1;
+      }
+      return hoverAnchor.i;
+    }
+
+    if (acquired >= 0) {
+      setHoverAnchor(acquired);
+      return acquired;
+    }
+
+    if (current >= 0 && brandDist(current) < ACQUIRE_R * 0.85) {
+      setHoverAnchor(current);
+      return current;
+    }
+
+    return -1;
   };
 
   listen(window, "pointermove", (e) => {
@@ -983,7 +1057,7 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
     m.px = e.clientX;
     m.py = e.clientY;
     m.t = now();
-    const hit = nearestBrand();
+    const hit = nearestBrand(focus);
     if (hit >= 0 && hit === focus) doEnter(hit);
   });
 
@@ -992,6 +1066,7 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
     T0 = reduced ? now() - 12 : now();
     enterIndex = null;
     focus = -1;
+    clearHoverAnchor();
     toast?.classList.remove("on");
     root.classList.remove("is-in", "is-open", "is-tags");
     void root.offsetWidth;
@@ -1050,16 +1125,23 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
     let f = -1;
     if (enterIndex !== null) f = enterIndex;
     else if (lock >= 0) f = lock;
-    else if (userActive && tt > 6) f = nearestBrand();
+    else if (userActive && tt > 6) f = nearestBrand(focus);
     else if (!userActive && tt > 6 && !reduced) {
       const q = (tt - 6) % cycle;
       f = q < 3 ? -1 : Math.floor((q - 3) / 4);
     }
-    if (f !== focus && enterIndex === null) focus = f;
+    if (f !== focus && enterIndex === null) {
+      const switchingBrands = f >= 0 && focus >= 0;
+      if (!switchingBrands || t - lastFocusChange >= FOCUS_SWITCH_GAP) {
+        focus = f;
+        lastFocusChange = t;
+        if (f < 0) clearHoverAnchor();
+      }
+    }
     if (focus !== shownF) {
       shownF = focus;
       if (focus >= 0) fire(centers[focus + 1]);
-      panes.forEach((p, i) => p.classList.toggle("on", i === focus + 1));
+      panes.forEach((p, i) => p.classList.toggle("on", i === focus));
       links.forEach((a, i) => a.classList.toggle("on", i === focus));
       if (hvEl) hvEl.textContent = focus >= 0 ? brands[focus].latin : "OVERVIEW";
       if (ghost) {
@@ -1077,41 +1159,57 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
       fire(centers[Math.floor(Math.random() * nAll)]);
     }
 
-    // highlights
+    // highlights — soft ease in/out with focus
+    const hlEase = focus >= 0 ? 0.045 : 0.038;
     for (let i = 0; i < nAll; i++) {
       const target = i === 0 ? (focus < 0 ? 1 : 0) : i - 1 === focus ? 1 : 0;
-      H[i] += (target - H[i]) * 0.07;
+      H[i] += (target - H[i]) * hlEase;
     }
-    U.uFa.value += ((focus >= 0 ? 1 : 0) - U.uFa.value) * 0.07;
+    U.uFa.value += ((focus >= 0 ? 1 : 0) - U.uFa.value) * hlEase;
     spheres.forEach((s, i) => {
       const arr = i ? 0.5 + i * 0.07 : 0.02;
       const k = ease((U.uGrow.value - arr) / 0.22);
-      s.scale.setScalar(Math.max(0.001, k) * (1 + H[i] * 0.1 * (i ? 1 : 0)));
+      s.scale.setScalar(Math.max(0.001, k) * (1 + H[i] * 0.08 * (i ? 1 : 0)));
       (s.material as THREE.ShaderMaterial).uniforms.uHl.value = H[i];
     });
 
     // motion
     const rY = focus >= 0 || reduced ? 0 : Math.sin(t * 0.16) * 0.3 + m.nx * 0.22;
     const rX = focus >= 0 || reduced ? 0 : m.ny * 0.12;
-    group.rotation.y += (rY - group.rotation.y) * 0.04;
-    group.rotation.x += (rX - group.rotation.x) * 0.04;
+    const rotEase = focus >= 0 ? 0.028 : 0.032;
+    group.rotation.y += (rY - group.rotation.y) * rotEase;
+    group.rotation.x += (rX - group.rotation.x) * rotEase;
     centers.forEach((c, i) => {
-      if (i && !reduced) spheres[i].position.y = c.y + Math.sin(t * 0.8 + i) * 5;
+      if (i && !reduced) {
+        // Freeze bob while focused so screen-space pick stays stable.
+        const amp = focus >= 0 ? 0 : 5;
+        const y = c.y + Math.sin(t * 0.8 + i) * amp;
+        spheres[i].position.y += (y - spheres[i].position.y) * (focus >= 0 ? 0.055 : 0.07);
+      }
     });
 
-    // camera
+    // camera — full close approach; slower ease in on hover, softer ease out on leave
     const wide = window.innerWidth / window.innerHeight > 1.1;
     const dz = 1 + Math.max(0, 1 - tt / 4.4) * 1.3;
-    camT.set(m.nx * 30, m.ny * -20 + 10, camZ * dz * (wide ? 1.04 : 1.5));
+    const baseZ = camZ * dz * (wide ? 1.04 : 1.5);
+    camT.set(m.nx * 30, m.ny * -20 + 10, baseZ);
     camL.set(0, 0, 0);
     if (focus >= 0) {
       v3.copy(centers[focus + 1]).applyMatrix4(group.matrixWorld);
-      camT.set(v3.x * 0.78, v3.y * 0.78, v3.z + (enterIndex !== null ? 200 : 330));
+      const approachZ = enterIndex !== null ? 200 : 330;
+      camT.set(v3.x * 0.78, v3.y * 0.78, v3.z + approachZ);
       camL.copy(v3).multiplyScalar(0.92);
     }
-    camera.position.lerp(camT, 0.04);
-    camLc.lerp(camL, 0.06);
+    const camEase =
+      enterIndex !== null ? 0.048 : focus >= 0 ? 0.022 : 0.026;
+    const lookEase =
+      enterIndex !== null ? 0.065 : focus >= 0 ? 0.028 : 0.032;
+    camera.position.lerp(camT, camEase);
+    camLc.lerp(camL, lookEase);
     camera.lookAt(camLc);
+
+    // Cursor affordance when a brand is under the pointer / locked.
+    root.style.cursor = focus >= 0 && enterIndex === null ? "pointer" : "";
 
     // tags
     tags.forEach((d, i) => {
@@ -1155,6 +1253,8 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
     textures.forEach((tex) => tex.dispose());
     renderer.dispose();
     root.classList.remove("is-open", "is-in", "is-tags");
+    root.style.cursor = "";
+    clearHoverAnchor();
     panes.forEach((p) => p.classList.remove("on"));
     links.forEach((a) => a.classList.remove("on"));
     toast?.classList.remove("on");

@@ -1,11 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { divisions } from "@/lib/divisions";
-import { nexusCopy, toFa } from "@/lib/nexus";
+import { nexusCopy } from "@/lib/nexus";
 import { createNexusScene, type NexusBrand } from "./nexus-scene";
 import "./nexus.css";
 
@@ -43,10 +42,10 @@ export function LandingExperience() {
       <div className="nx-lb nx-lb-b" aria-hidden />
 
       <header className="nx-ui nx-top">
-        <div className="nx-links">
+        {/* <div className="nx-links">
           <a href="#">درباره ما</a>
           <a href="#">تماس</a>
-        </div>
+        </div> */}
         <h1 className="nx-logo">
           <Image
             src="/logo.png"
@@ -65,22 +64,22 @@ export function LandingExperience() {
         FOCUS · <b data-nx="focus">OVERVIEW</b>
       </div> */}
 
-      <nav className="nx-ui nx-idx" aria-label="بخش‌های هانس">
+      {/* <nav className="nx-ui nx-idx" aria-label="بخش‌های هانس">
         {divisions.map((division, i) => (
           <Link
             key={division.slug}
             href={`/worlds/${division.slug}`}
             data-nx-link
           >
-            {/* <small>{toFa(i + 1)}</small> */}
+            <small>{toFa(i + 1)}</small>
             <b>{division.label}</b>
             <i aria-hidden>{nexusCopy[division.slug].latin}</i>
           </Link>
         ))}
-      </nav>
+      </nav> */}
 
-      <section className="nx-ui nx-card" aria-label="معرفی">
-        <div className="nx-pane" data-nx-pane>
+      <section className="nx-ui nx-card" aria-label="بخش‌ها">
+        {/* <div className="nx-pane" data-nx-pane>
           <small>COLLECTION — {toFa(divisions.length)} BRANDS</small>
           <h2 className="s">
             {toFa(divisions.length) === "۵" ? "پنج فضا،" : "چند فضا،"}
@@ -91,7 +90,7 @@ export function LandingExperience() {
             هانس کمپانی سفر، تصویر، رسانه، آموزش و ملزومات را به هم وصل می‌کند. روی هر نورون برو تا
             وارد بشی.
           </p>
-        </div>
+        </div> */}
         {divisions.map((division, i) => (
           <div key={division.slug} className="nx-pane" data-nx-pane>
             <small>
@@ -117,6 +116,10 @@ export function LandingExperience() {
           &nbsp;·&nbsp; <b data-nx="clock">00:00</b>
         </span>
       </div> */}
+
+      <footer className="nx-ui nx-copy">
+        © {new Date().getFullYear()} هانس کمپانی — همه حقوق محفوظ است
+      </footer>
 
       <div aria-hidden>
         {brands.map((brand) => (
