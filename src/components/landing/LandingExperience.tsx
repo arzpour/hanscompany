@@ -12,6 +12,7 @@ const brands: NexusBrand[] = divisions.map((division) => ({
   slug: division.slug,
   label: division.label,
   latin: nexusCopy[division.slug].latin,
+  desc: nexusCopy[division.slug].desc,
 }));
 
 export function LandingExperience() {
@@ -46,6 +47,7 @@ export function LandingExperience() {
           <a href="#">درباره ما</a>
           <a href="#">تماس</a>
         </div> */}
+        <p className="nx-focusline" data-nx="focusline" aria-live="polite" />
         <h1 className="nx-logo">
           <Image
             src="/logo.png"
@@ -93,14 +95,14 @@ export function LandingExperience() {
         </div> */}
         {divisions.map((division, i) => (
           <div key={division.slug} className="nx-pane" data-nx-pane>
-            <small>
+            {/* <small>
               {String(i + 1).padStart(2, "0")} — {nexusCopy[division.slug].latin}
             </small>
             <h2>{division.label}</h2>
             <p>{nexusCopy[division.slug].desc}</p>
             <button type="button" className="nx-go" data-nx-go={i}>
               ورود به بخش ←
-            </button>
+            </button> */}
           </div>
         ))}
       </section>

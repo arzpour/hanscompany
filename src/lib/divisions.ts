@@ -1,7 +1,7 @@
 export const divisions = [
   {
     slug: "agency",
-    label: "آژانس تبلیغاتی",
+    label: "آژانس تبلیغاتی هانس",
     index: "۰۱",
     x: -0.42,
     y: 0.92,
@@ -11,7 +11,7 @@ export const divisions = [
   },
   {
     slug: "pixel",
-    label: "پیکسل",
+    label: "هانس پیکسل",
     index: "۰۲",
     x: 1.28,
     y: 0.42,
@@ -21,7 +21,7 @@ export const divisions = [
   },
   {
     slug: "media",
-    label: "مدیا",
+    label: "هانس مدیا",
     index: "۰۳",
     x: 0.18,
     y: 0.04,
@@ -31,7 +31,7 @@ export const divisions = [
   },
   {
     slug: "academy",
-    label: "آکادمی",
+    label: "هانس آکادمی",
     index: "۰۴",
     x: -1.42,
     y: -0.28,
@@ -41,7 +41,7 @@ export const divisions = [
   },
   {
     slug: "supplies",
-    label: "ملزومات",
+    label: "ملزومات هانس",
     index: "۰۵",
     x: 0.72,
     y: -0.92,

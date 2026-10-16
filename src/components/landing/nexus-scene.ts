@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-export type NexusBrand = { slug: string; label: string; latin: string };
+export type NexusBrand = { slug: string; label: string; latin: string; desc: string };
 
 type NexusOptions = {
   brands: NexusBrand[];
@@ -93,6 +93,7 @@ export function createNexusScene(root: HTMLElement, opts: NexusOptions): () => v
   const toast = one<HTMLElement>('[data-nx="toast"]');
   const cur = one<HTMLElement>('[data-nx="cursor"]');
   const ring = one<HTMLElement>('[data-nx="ring"]');
+  const focusLine = one<HTMLElement>('[data-nx="focusline"]');
   const links = many<HTMLAnchorElement>("[data-nx-link]");
   const panes = many<HTMLElement>("[data-nx-pane]");
   const tags = many<HTMLElement>("[data-nx-tag]");
@@ -1139,6 +1140,24 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
       panes.forEach((p, i) => p.classList.toggle("on", i === focus));
       links.forEach((a, i) => a.classList.toggle("on", i === focus));
       if (hvEl) hvEl.textContent = focus >= 0 ? brands[focus].latin : "OVERVIEW";
+      if (focusLine) {
+        if (focus >= 0) {
+          const b = brands[focus];
+          const name = document.createElement("strong");
+          name.textContent = b.label;
+          const sep = document.createElement("span");
+          sep.className = "nx-focusline-sep";
+          sep.textContent = "-";
+          const desc = document.createElement("span");
+          desc.className = "nx-focusline-desc";
+          desc.textContent = b.desc;
+          focusLine.replaceChildren(name, sep, desc);
+          focusLine.classList.add("on");
+        } else {
+          focusLine.replaceChildren();
+          focusLine.classList.remove("on");
+        }
+      }
       if (ghost) {
         ghost.style.opacity = "0";
         later(() => {
@@ -1253,6 +1272,10 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
     panes.forEach((p) => p.classList.remove("on"));
     links.forEach((a) => a.classList.remove("on"));
     toast?.classList.remove("on");
+    if (focusLine) {
+      focusLine.replaceChildren();
+      focusLine.classList.remove("on");
+    }
     if (ghost) {
       ghost.textContent = "HANS";
       ghost.style.opacity = "";
