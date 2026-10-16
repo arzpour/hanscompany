@@ -120,7 +120,7 @@ export function LandingExperience() {
       </div> */}
 
       <footer className="nx-ui nx-copy">
-        © {new Date().getFullYear()} هانس کمپانی — همه حقوق محفوظ است
+        © 2026 هانس کمپانی — همه حقوق محفوظ است
       </footer>
 
       <div aria-hidden>
