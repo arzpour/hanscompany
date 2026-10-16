@@ -1120,16 +1120,11 @@ void main(){vec3 N=normalize(vN),V=normalize(vV);float nv=clamp(dot(N,V),0.,1.);
       sp[i].y = (-v3.y * 0.5 + 0.5) * window.innerHeight;
     });
 
-    // focus selection
-    const userActive = t - m.t < 3.5;
+    // focus only from pointer hover (or nav lock / enter) — no auto tour
     let f = -1;
     if (enterIndex !== null) f = enterIndex;
     else if (lock >= 0) f = lock;
-    else if (userActive && tt > 6) f = nearestBrand(focus);
-    else if (!userActive && tt > 6 && !reduced) {
-      const q = (tt - 6) % cycle;
-      f = q < 3 ? -1 : Math.floor((q - 3) / 4);
-    }
+    else if (tt > 6) f = nearestBrand(focus);
     if (f !== focus && enterIndex === null) {
       const switchingBrands = f >= 0 && focus >= 0;
       if (!switchingBrands || t - lastFocusChange >= FOCUS_SWITCH_GAP) {
